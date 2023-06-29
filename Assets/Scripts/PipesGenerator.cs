@@ -22,7 +22,8 @@ public class PipesGenerator : MonoBehaviour
     {
         while (_lastSpawnedPipe.IsVisible)
         { 
-            SpawnPipe(_lastSpawnedPosition +  _spaceBetweenPipes);
+            SpawnPipe(_lastSpawnedPosition +  _spaceBetweenPipes +
+                _lastSpawnedPipe.GetComponentInChildren<SpriteRenderer>().size.x);
         }
     }
 
@@ -35,12 +36,14 @@ public class PipesGenerator : MonoBehaviour
         var pipeHandler = Instantiate(_pipeHandler, transform);
 
         var topPipeHeight = Random.Range(1, height - 1);
-        CreatePipe(pipeHandler, topPipeHeight,
-            new Vector2(pipePosX, (height + _spaceBetweenTopAndBottomPipes - topPipeHeight) / 2));
+        CreatePipe(pipeHandler, 
+            new Vector2(pipePosX, (height + _spaceBetweenTopAndBottomPipes - topPipeHeight) / 2),
+            topPipeHeight);
 
         var bottomPipeHeight = height - topPipeHeight;
-        CreatePipe(pipeHandler, bottomPipeHeight,
-            new Vector2(pipePosX, -(height + _spaceBetweenTopAndBottomPipes - bottomPipeHeight) / 2));
+        CreatePipe(pipeHandler,
+            new Vector2(pipePosX, -(height + _spaceBetweenTopAndBottomPipes - bottomPipeHeight) / 2),
+            bottomPipeHeight, true);
 
         _lastSpawnedPipe = pipeHandler;
         _lastSpawnedPosition = pipePosX;
@@ -54,11 +57,12 @@ public class PipesGenerator : MonoBehaviour
         return camTopRightCorner.y - camBottomLeftCorner.y;
     }
 
-    private void CreatePipe(Pipe pipeHandler, float height, Vector2 position)
+    private void CreatePipe(Pipe pipeHandler, Vector2 position, float height, bool flipY = false)
     {
-        var pipe = Instantiate(_pipeBase, pipeHandler.transform);
-        pipe.transform.localScale = new Vector3(1, height, 1);
-        pipe.transform.position = position;
+        var pipe = Instantiate(_pipeBase, position, Quaternion.identity, pipeHandler.transform);
+        pipe.GetComponent<SpriteRenderer>().size = new Vector2(1, height);
+        pipe.GetComponent<SpriteRenderer>().flipY = flipY;
+        pipe.GetComponent<BoxCollider2D>().size = new Vector2(1, height);
         pipeHandler.AddPipe(pipe);
     }
 }
