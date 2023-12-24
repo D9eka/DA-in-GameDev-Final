@@ -4,13 +4,13 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Bird
-  - Enemy
+  - Check
+  - Pipe
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Bird
   - Water
   - UI
   - 
