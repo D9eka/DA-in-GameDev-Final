@@ -18,10 +18,12 @@ public class MidgroundGenerator : Generator
 
         Instance = this;
         
-        _prefab.GetComponent<SpriteRenderer>().size = new Vector2(_cameraWidth, _prefab.GetComponent<SpriteRenderer>().size.y);
-        _prefab.GetComponent<BoxCollider2D>().size = new Vector2(_cameraWidth, _prefab.GetComponent<BoxCollider2D>().size.y);
-        _topColliderPrefab.transform.localScale = new Vector2(_cameraWidth, _topColliderPrefab.transform.localScale.y);
-        _prefabWidth = _cameraWidth;
+        SpriteRenderer prefabRenderer = _prefab.GetComponent<SpriteRenderer>();
+        prefabRenderer.size = new Vector2(_levelWidth, prefabRenderer.size.y);
+        BoxCollider2D prefabCollider = _prefab.GetComponent<BoxCollider2D>();
+        prefabCollider.size = new Vector2(_levelWidth, prefabCollider.size.y);
+        _topColliderPrefab.transform.localScale = new Vector2(_levelWidth, _topColliderPrefab.transform.localScale.y);
+        _prefabWidth = _levelWidth;
         _prefabHeight = _prefab.GetComponent<SpriteRenderer>().size.y;
 
         SpawnPrefab();
@@ -37,10 +39,10 @@ public class MidgroundGenerator : Generator
 
         if (_spawnedPrefabs.Count == 0)
         {
-            Spawn(_cameraLeftEdge + _prefabWidth / 2);
+            Spawn(_levelLeftEdge + _prefabWidth / 2);
         }
 
-        while (_spawnedPrefabs.Last().position.x < _cameraRightEdge)
+        while (_spawnedPrefabs.Last().position.x < _levelRightEdge)
         {
             Spawn(_spawnedPrefabs.Last().position.x + _prefabWidth);
         }
@@ -49,12 +51,12 @@ public class MidgroundGenerator : Generator
     private void Spawn(float positionX)
     {
         Transform midgroundHandler = Instantiate(_midgroundHandler, new Vector2(positionX, 0),
-                                                  Quaternion.identity, transform).transform;
+                                                 Quaternion.identity, transform).transform;
 
         Instantiate(_prefab,
-                    new Vector2(positionX, (-_cameraHeight + _prefabHeight) / 2), Quaternion.identity, midgroundHandler);
+                    new Vector2(positionX, (-_levelHeight + _prefabHeight) / 2), Quaternion.identity, midgroundHandler);
         Instantiate(_topColliderPrefab,
-                    new Vector2(positionX, (_cameraHeight + _prefabHeight) / 2), Quaternion.identity, midgroundHandler);
+                    new Vector2(positionX, (_levelHeight + _prefabHeight) / 2), Quaternion.identity, midgroundHandler);
         _spawnedPrefabs.Add(midgroundHandler.transform);
     }
 }

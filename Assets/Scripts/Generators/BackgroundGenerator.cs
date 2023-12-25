@@ -15,9 +15,9 @@ public class BackgroundGenerator : Generator
 
         Instance = this;
 
-        var scale = _cameraHeight / _prefab.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        var scale = _levelHeight / _prefab.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         _prefab.transform.localScale = new Vector2(scale, scale);
-        _prefabWidth = _cameraHeight;
+        _prefabWidth = _levelHeight;
         SpawnPrefab();
     }
 
@@ -30,11 +30,11 @@ public class BackgroundGenerator : Generator
     {
         if(_spawnedPrefabs.Count == 0)
         {
-            GameObject background = Instantiate(_prefab, new Vector2(_cameraLeftEdge, 0f), Quaternion.identity, transform);
+            GameObject background = Instantiate(_prefab, new Vector2(_levelLeftEdge, 0f), Quaternion.identity, transform);
             _spawnedPrefabs.Add(background.transform);
         }
 
-        while (_spawnedPrefabs.Last().position.x < _cameraRightEdge)
+        while (_spawnedPrefabs.Last().position.x < _levelRightEdge)
         {
             GameObject background = Instantiate(_prefab, new Vector2(_spawnedPrefabs.Last().position.x + _prefabWidth, 0f), Quaternion.identity, transform);
             _spawnedPrefabs.Add(background.transform);

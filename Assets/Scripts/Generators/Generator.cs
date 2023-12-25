@@ -9,10 +9,10 @@ public abstract class Generator : MonoBehaviour
 
     protected float _prefabWidth;
 
-    protected float _cameraLeftEdge;
-    protected float _cameraRightEdge;
-    protected float _cameraWidth;
-    protected float _cameraHeight;
+    protected float _levelLeftEdge;
+    protected float _levelRightEdge;
+    protected float _levelWidth;
+    protected float _levelHeight;
 
     protected bool _active;
 
@@ -20,16 +20,33 @@ public abstract class Generator : MonoBehaviour
 
     protected virtual void Start()
     {
-        Vector2 cameraBottomLeftAngle = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, Camera.main.nearClipPlane));
-        Vector2 cameraTopRightAngle = Camera.main.ViewportToWorldPoint(new Vector3(1f, 1f, Camera.main.nearClipPlane));
-        _cameraLeftEdge = cameraBottomLeftAngle.x;
-        _cameraRightEdge = cameraTopRightAngle.x;
-        _cameraWidth = _cameraRightEdge - _cameraLeftEdge;
-        _cameraHeight = cameraTopRightAngle.y - cameraBottomLeftAngle.y;
-
+        GetLevelParams();
+        Initialize();
+        
         UI.Instance.OnGameStart += UI_OnGameStart;
         LevelController.Instance.OnChangeDifficulty += Level_OnChangeDifficulty;
         BirdController.Instance.OnDied += BirdComponent_OnDied;
+
+        if(LevelController.Instance.ForceStart)
+        {
+            _active = true;
+        }
+    }
+
+    private void GetLevelParams()
+    {
+        LevelController level = LevelController.Instance;
+        _levelLeftEdge = level.LeftEdge;
+        _levelRightEdge = level.RightEdge;
+        _levelWidth = level.Width;
+        _levelHeight = level.Height;
+    }
+
+    protected virtual void Initialize()
+    {
+        LevelDifficulty values = LevelController.Instance.GetInitialValues();
+
+        _speed = values.Speed;
     }
 
     private void UI_OnGameStart(object sender, EventArgs e)
@@ -40,6 +57,7 @@ public abstract class Generator : MonoBehaviour
     protected virtual void Level_OnChangeDifficulty(object sender, LevelDifficulty e)
     {
         _speed = e.Speed;
+        Debug.Log("Changed");
     }
 
     private void BirdComponent_OnDied(object sender, EventArgs e)
@@ -69,7 +87,7 @@ public abstract class Generator : MonoBehaviour
             Vector3 tempVect = Vector2.left * _speed * Time.fixedDeltaTime;
             prefab.GetComponent<Rigidbody2D>().MovePosition(prefab.position + tempVect);
 
-            if (prefab.position.x < _cameraLeftEdge - _prefabWidth)
+            if (prefab.position.x < _levelLeftEdge - _prefabWidth)
             {
                 Destroy(prefab.gameObject);
                 _spawnedPrefabs.Remove(prefab);

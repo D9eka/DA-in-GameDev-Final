@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class UI : MonoBehaviour
 {
-    [SerializeField] private bool _forceStart;
     [SerializeField] private Button _startButton;
     [SerializeField] private Button _restartButton;
     [Space]
@@ -47,11 +46,21 @@ public class UI : MonoBehaviour
     {
         BirdController.Instance.OnIncreaseScore += BirdComponent_OnIncreaseScore;
         BirdController.Instance.OnDied += BirdComponent_OnDied;
-
-        if (_forceStart)
+        if(BirdController.Instance.TryGetComponent(out BirdAgent agent))
         {
-            Invoke(nameof(OnStartButtonClick), 1f);
+            agent.OnEpisodeBeginEvent += BirdAgent_OnEpisodeBeginEvent;
         }
+
+        if(LevelController.Instance.ForceStart)
+        {
+            _startButton.gameObject.SetActive(false);
+            _scoreHandler.SetActive(true);
+        }
+    }
+
+    private void BirdAgent_OnEpisodeBeginEvent(object sender, EventArgs e)
+    {
+        OnStartButtonClick();
     }
 
     private void OnStartButtonClick()

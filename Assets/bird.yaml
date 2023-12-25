@@ -14,18 +14,14 @@ behaviors:
       normalize: false
       hidden_units: 128
       num_layers: 2
-    reward_signals:
-      extrinsic:
-        strength: 0.1
-        gamma: 0.99
       gail:
-        strength: 0.5
+        strength: 0.1
         gamma: 0.8
-        demo_path: Demos/Bird_0.demo
+        demo_path: Demos/Bird.demo
     behavioral_cloning:
         strength: 1.0
         gamma: 0.8
-        demo_path: Demos/Bird_0.demo
+        demo_path: Demos/Bird.demo
     max_steps: 500000
     time_horizon: 2048
     summary_freq: 20000

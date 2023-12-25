@@ -12,6 +12,11 @@ public class TimeComponent : MonoBehaviour
 
         UI.Instance.OnGameStart += UI_OnGameStart;
         BirdController.Instance.OnDied += BirdComponent_OnDied;
+
+        if(LevelController.Instance.ForceStart)
+        {
+            Resume();
+        }
     }
 
     private void UI_OnGameStart(object sender, EventArgs e)

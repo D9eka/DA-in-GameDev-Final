@@ -429,7 +429,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f26d76475fe91434791ec9e5e53a9e51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _forceStart: 0
   _startButton: {fileID: 1766570740}
   _restartButton: {fileID: 1401849687}
   _scoreHandler: {fileID: 1659395263}
@@ -567,25 +566,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _difficulties:
   - ScoreToActivate: 0
-    Speed: 3
-    PipeSpawnDelay: 4
+    Speed: 6
+    PipeSpawnDelay: 1
     SpaceBetweenPipes: 7
-  - ScoreToActivate: 5
-    Speed: 3
-    PipeSpawnDelay: 4
-    SpaceBetweenPipes: 6
-  - ScoreToActivate: 10
-    Speed: 3
-    PipeSpawnDelay: 4
+  - ScoreToActivate: 25
+    Speed: 6
+    PipeSpawnDelay: 1
     SpaceBetweenPipes: 5
-  - ScoreToActivate: 15
-    Speed: 3
-    PipeSpawnDelay: 4
-    SpaceBetweenPipes: 4
-  - ScoreToActivate: 20
-    Speed: 3
-    PipeSpawnDelay: 4
-    SpaceBetweenPipes: 3
+  - ScoreToActivate: 50
+    Speed: 6
+    PipeSpawnDelay: 1
+    SpaceBetweenPipes: 3.75
+  - ScoreToActivate: 75
+    Speed: 8
+    PipeSpawnDelay: 0.75
+    SpaceBetweenPipes: 3.75
+  _forceStart: 1
 --- !u!1 &610492677
 GameObject:
   m_ObjectHideFlags: 0
@@ -808,6 +804,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SensorName: RayPerceptionSensor
   m_DetectableTags:
+  - Check
   - Pipe
   m_RaysPerDirection: 4
   m_MaxRayDegrees: 85
@@ -1310,7 +1307,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1346418963}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2902496c0120472b90269f94a0aec7e, type: 3}
   m_Name: 
@@ -1362,7 +1359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 4
+    VectorObservationSize: 3
     NumStackedVectorObservations: 2
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -1371,9 +1368,9 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 5c83678d8f69e4a47b9af2b21755740a, type: 3}
   m_InferenceDevice: 3
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: Bird
   TeamId: 0
   m_UseChildSensors: 1

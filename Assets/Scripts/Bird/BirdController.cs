@@ -32,22 +32,21 @@ public class BirdController : MonoBehaviour
         {
             agent.OnJump += BirdInputReader_OnJump;
         }
+
+        if (LevelController.Instance.ForceStart)
+        {
+            GetComponent<PlayerInput>().ActivateInput();
+        }
     }
 
     private void BirdInputReader_OnJump(object sender, EventArgs e)
     {
-        Jump();
+        _rigidbody.velocity = Vector2.up * _jumpForce;
     }
 
     private void UI_OnGameStart(object sender, EventArgs e)
     {
         GetComponent<PlayerInput>().ActivateInput();
-        TimeComponent.Instance.Resume();
-    }
-
-    public void Jump()
-    {
-        _rigidbody.velocity = Vector2.up * _jumpForce; 
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -62,5 +61,10 @@ public class BirdController : MonoBehaviour
     {
         _score++;
         OnIncreaseScore?.Invoke(this, _score);
+    }
+
+    public float GetNormalizedVelocity()
+    {
+        return _rigidbody.velocity.y / _jumpForce;
     }
 }

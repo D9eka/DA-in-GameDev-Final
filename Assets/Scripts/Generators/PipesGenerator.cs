@@ -12,6 +12,8 @@ public class PipesGenerator : Generator
 
     private float _pipeSpawnCounter;
 
+    public float SpawnPosition { get; private set; }
+
     public static PipesGenerator Instance { get; private set; }
 
     protected override void Start()
@@ -21,6 +23,16 @@ public class PipesGenerator : Generator
         Instance = this;
 
         _prefabWidth = _prefab.transform.localScale.x;
+        SpawnPosition = _levelRightEdge + _prefabWidth;
+    }
+
+    protected override void Initialize()
+    {
+        LevelDifficulty values = LevelController.Instance.GetInitialValues();
+
+        _speed = values.Speed;
+        _pipeSpawnDelay = values.PipeSpawnDelay;
+        _spaceBetweenPipes = values.SpaceBetweenPipes;
     }
 
     protected override void Level_OnChangeDifficulty(object sender, LevelDifficulty e)
@@ -54,23 +66,22 @@ public class PipesGenerator : Generator
 
     protected override void SpawnPrefab()
     {
-        float pipePosX = _cameraRightEdge + _prefabWidth;
+        float height = _levelHeight - _spaceBetweenPipes;
 
-        float height = _cameraHeight - _spaceBetweenPipes;
-
-        GameObject pipeHandler = Instantiate(_pipeHandler, new Vector2(pipePosX, 0), Quaternion.identity, transform);
+        GameObject pipeHandler = Instantiate(_pipeHandler, new Vector2(SpawnPosition, 0), Quaternion.identity, transform);
 
         float topPipeHeight = Random.Range(_minPipeHeight, height - _minPipeHeight);
         CreatePipe(pipeHandler,
-            new Vector2(pipePosX, (_cameraHeight - topPipeHeight) / 2),
+            new Vector2(SpawnPosition, (_levelHeight - topPipeHeight) / 2),
             topPipeHeight);
 
-        GameObject scoreTrigger = Instantiate(_scoreTrigger, new Vector2(pipePosX, (_cameraHeight - _spaceBetweenPipes) / 2 - topPipeHeight), Quaternion.identity, pipeHandler.transform);
+        GameObject scoreTrigger = Instantiate(_scoreTrigger, new Vector2(SpawnPosition, (_levelHeight - _spaceBetweenPipes) / 2 - topPipeHeight), 
+                                              Quaternion.identity, pipeHandler.transform);
         scoreTrigger.transform.localScale = new Vector2(scoreTrigger.transform.localScale.x, _spaceBetweenPipes);
 
          float bottomPipeHeight = height - topPipeHeight;
         CreatePipe(pipeHandler,
-            new Vector2(pipePosX, -(_cameraHeight - bottomPipeHeight) / 2),
+            new Vector2(SpawnPosition, -(_levelHeight - bottomPipeHeight) / 2),
             bottomPipeHeight, true);
 
         _spawnedPrefabs.Add(pipeHandler.transform);
@@ -79,12 +90,14 @@ public class PipesGenerator : Generator
     private void CreatePipe(GameObject pipeHandler, Vector2 position, float height, bool flipY = false)
     {
         GameObject pipe = Instantiate(_prefab, position, Quaternion.identity, pipeHandler.transform);
-        pipe.GetComponent<SpriteRenderer>().size = new Vector2(1, height);
-        pipe.GetComponent<SpriteRenderer>().flipY = flipY;
-        pipe.GetComponent<BoxCollider2D>().size = new Vector2(1, height);
+        SpriteRenderer renderer = pipe.GetComponent<SpriteRenderer>();
+        renderer.size = new Vector2(renderer.size.x, height);
+        renderer.flipY = flipY;
+        BoxCollider2D collider = pipe.GetComponent<BoxCollider2D>();
+        collider.size = new Vector2(collider.size.x, height);
     }
 
-    public PipeConfig GetNextPipe()
+    public float? GetNextPipePosition()
     {
         if (_spawnedPrefabs.Count == 0)
             return null;
@@ -94,22 +107,9 @@ public class PipesGenerator : Generator
             GameObject pipe = _spawnedPrefabs[i].gameObject;
             if (pipe.transform.position.x > BirdController.Instance.transform.position.x)
             {
-                Transform pipeGap = pipe.GetComponentsInChildren<BoxCollider2D>()[1].transform;
-                return new PipeConfig(pipeGap.position.y + pipeGap.localScale.y / 2, pipeGap.position.y - pipeGap.localScale.y / 2);
+                return pipe.transform.position.x;
             }
         }
         return null;
-    }
-}
-
-public class PipeConfig
-{
-    public float pipeGapTop { get; private set; }
-    public float pipeGapBottom { get; private set; }
-
-    public PipeConfig(float pipeGapTop, float pipeGapBottom)
-    {
-        this.pipeGapTop = pipeGapTop;
-        this.pipeGapBottom = pipeGapBottom;
     }
 }

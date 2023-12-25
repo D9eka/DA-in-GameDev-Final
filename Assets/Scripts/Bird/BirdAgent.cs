@@ -9,6 +9,9 @@ public class BirdAgent : Agent
 {
     private BirdController bird;
 
+    private bool isJumpInputDown;
+
+    public EventHandler OnEpisodeBeginEvent;
     public EventHandler OnJump;
 
     private void Awake()
@@ -27,34 +30,45 @@ public class BirdAgent : Agent
         AddReward(1f);
     }
 
-    private void Bird_OnDied(object sender, System.EventArgs e)
+    private void Bird_OnDied(object sender, EventArgs e)
     {
         EndEpisode();
 
-        new ReloadLevelComponent().Reload();
+        ReloadLevelComponent.Reload();
+    }
+
+    /*
+    private void Update()
+    {
+        isJumpInputDown = Keyboard.current.spaceKey.wasPressedThisFrame || 
+                          Mouse.current.leftButton.wasPressedThisFrame;
+    }
+    */
+
+    public override void OnEpisodeBegin()
+    {
+        OnEpisodeBeginEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        Vector2 cameraBottomLeftAngle = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, Camera.main.nearClipPlane));
-        Vector2 cameraTopRightAngle = Camera.main.ViewportToWorldPoint(new Vector3(1f, 1f, Camera.main.nearClipPlane));
-        float cameraHeight = cameraTopRightAngle.y - cameraBottomLeftAngle.y;
-        float birdNormalizedY = (bird.transform.position.y + (cameraHeight / 2f)) / cameraHeight;
+        LevelController level = LevelController.Instance;
+        float birdNormalizedY = (bird.transform.position.y + (level.Height / 2f)) / level.Height;
         sensor.AddObservation(birdNormalizedY);
 
-        PipeConfig nextPipe = PipesGenerator.Instance.GetNextPipe();
-        if (nextPipe != null)
+        PipesGenerator pipesGenerator = PipesGenerator.Instance;
+        float pipeSpawnPosition = pipesGenerator.SpawnPosition;
+        float? nextPipePosition = pipesGenerator.GetNextPipePosition();
+        if (nextPipePosition != null)
         {
-            sensor.AddObservation(nextPipe.pipeGapTop);
-            sensor.AddObservation(nextPipe.pipeGapBottom);
+            sensor.AddObservation(nextPipePosition.Value / pipeSpawnPosition);
         }
         else
         {
             sensor.AddObservation(1f);
-            sensor.AddObservation(1f);
         }
 
-        sensor.AddObservation(bird.GetComponent<Rigidbody2D>().velocity.y / cameraHeight);
+        sensor.AddObservation(bird.GetNormalizedVelocity());
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -67,10 +81,13 @@ public class BirdAgent : Agent
         Debug.Log(GetCumulativeReward());
     }
 
+    /*
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         ActionSegment<int> discreteActions = actionsOut.DiscreteActions;
-        discreteActions[0] = Keyboard.current.spaceKey.IsPressed() ? 1 : 0;
-    }
+        discreteActions[0] = isJumpInputDown ? 1 : 0;
 
+        isJumpInputDown = false;
+    }
+    */
 }
